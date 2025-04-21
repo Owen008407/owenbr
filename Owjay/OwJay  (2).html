@@ -1,0 +1,190 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owen & Joyce's Memory Lane</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous" async></script>
+</head>
+<body>
+    <header>
+        <h1>Owen & Joyce's Memory Lane</h1>
+        <div class="notification">
+            <button id="bellBtn" title="Notify other device I'm online">
+                🔔 <span id="status">Offline</span>
+            </button>
+        </div>
+    </header>
+    <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 320 }'>
+        <!-- Sample Card 1 -->
+        <div class="grid-item">
+            <img src="https://via.placeholder.com/300x400" alt="Event Photo">
+            <div class="card-content">
+                <h3>Beach Day</h3>
+                <p><strong>Date:</strong> 2025-03-15</p>
+                <p><strong>Spent:</strong> Kshs 5,000</p>
+                <p><strong>Location:</strong> Diani Beach, Kenya</p>
+                <p><strong>Activities:</strong> Swimming, Snorkeling, Sunset Walk</p>
+            </div>
+        </div>
+        <!-- Sample Card 2 -->
+        <div class="grid-item">
+            <img src="https://via.placeholder.com/300x500" alt="Event Photo">
+            <div class="card-content">
+                <h3>Mountain Hike</h3>
+                <p><strong>Date:</strong> 2025-02-10</p>
+                <p><strong>Spent:</strong> USD 150</p>
+                <p><strong>Location:</strong> Mt. Longonot, Kenya</p>
+                <p><strong>Activities:</strong> Hiking, Photography, Picnic</p>
+            </div>
+        </div>
+        <!-- Add more cards as needed -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html><style>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    font-size: 2rem;
+    color: #e60023; /* Pinterest red vibe */
+}
+
+.notification {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#bellBtn {
+    background-color: #e60023;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#bellBtn:hover {
+    background-color: #b3001b;
+}
+
+.grid {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+.grid-item {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 300px;
+    transition: transform 0.2s;
+}
+
+.grid-item:hover {
+    transform: translateY(-5px);
+}
+
+.grid-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.card-content {
+    padding: 15px;
+}
+
+.card-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.card-content p {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 600px) {
+    .grid-item {
+        width: 100%;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    #bellBtn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}</style><script>// Initialize Masonry layout
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.querySelector('.grid');
+    new Masonry(grid, {
+        itemSelector: '.grid-item',
+        columnWidth: 320,
+        gutter: 20
+    });
+});
+
+// WebSocket for bell notification
+const bellBtn = document.getElementById('bellBtn');
+const statusSpan = document.getElementById('status');
+const ws = new WebSocket('ws://localhost:8080'); // Replace with your server URL
+
+ws.onopen = () => {
+    console.log('Connected to WebSocket server');
+    statusSpan.textContent = 'Connected';
+};
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'notification') {
+        alert(`${data.user} is online and viewing the site!`);
+        statusSpan.textContent = 'Notified';
+    }
+};
+
+ws.onclose = () => {
+    console.log('Disconnected from WebSocket server');
+    statusSpan.textContent = 'Offline';
+};
+
+bellBtn.addEventListener('click', () => {
+    const user = 'Owen or Joyce'; // You can customize this (e.g., prompt for user name)
+    ws.send(JSON.stringify({
+        type: 'notification',
+        user: user
+    }));
+    statusSpan.textContent = 'Notifying...';
+});</script>
